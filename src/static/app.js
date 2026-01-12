@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Check for saved dark mode preference or default to light mode
   const savedDarkMode = localStorage.getItem("darkMode");
-  if (savedDarkMode === "enabled") {
+  if (savedDarkMode === "true") {
     document.body.classList.add("dark-mode");
     darkModeIcon.textContent = "☀️";
   }
@@ -15,13 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.classList.toggle("dark-mode");
     
     // Update icon and save preference
-    if (document.body.classList.contains("dark-mode")) {
-      darkModeIcon.textContent = "☀️";
-      localStorage.setItem("darkMode", "enabled");
-    } else {
-      darkModeIcon.textContent = "🌙";
-      localStorage.setItem("darkMode", "disabled");
-    }
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    darkModeIcon.textContent = isDarkMode ? "☀️" : "🌙";
+    localStorage.setItem("darkMode", isDarkMode.toString());
   });
 
   // DOM elements

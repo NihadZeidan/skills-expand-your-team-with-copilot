@@ -40,10 +40,10 @@ body.dark-mode {
   --primary-dark: #49599a;
   --primary-text: #ffffff;
 
-  /* Secondary colors - adjusted for dark mode */
-  --secondary: #ff9800;
-  --secondary-light: #ffc947;
-  --secondary-dark: #c66900;
+  /* Secondary colors - adjusted for dark mode with better contrast */
+  --secondary: #ffb74d;
+  --secondary-light: #ffe97d;
+  --secondary-dark: #c88719;
   --secondary-text: #000000;
 
   /* Neutral colors - dark theme */
@@ -724,6 +724,7 @@ footer {
 }
 
 /* Adjust user controls positioning when dark mode toggle is present */
+/* Position accounts for toggle button width (40px) plus spacing (25px) */
 header #user-controls {
   right: 65px;
 }
