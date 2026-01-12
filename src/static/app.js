@@ -44,6 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Authentication state
   let currentUser = null;
 
+  // Configuration
+  const SCHOOL_NAME = "Mergington High School";
+
   // Time range mappings for the dropdown
   const timeRanges = {
     morning: { start: "06:00", end: "08:00" }, // Before school hours
@@ -472,6 +475,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Function to create share URLs for an activity
+  function createShareUrls(name, details) {
+    const formattedSchedule = formatSchedule(details);
+    const shareText = `Check out ${name} at ${SCHOOL_NAME}! ${details.description} Schedule: ${formattedSchedule}`;
+    const shareUrl = window.location.href;
+    
+    return {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+      email: `mailto:?subject=${encodeURIComponent(`Join ${name}!`)}&body=${encodeURIComponent(shareText + '\n\n' + shareUrl)}`
+    };
+  }
+
+  // Function to handle sharing
+  function shareActivity(platform, name, details) {
+    const urls = createShareUrls(name, details);
+    const url = urls[platform];
+    
+    if (platform === 'email') {
+      window.location.href = url;
+    } else {
+      window.open(url, '_blank', 'width=600,height=400,noopener,noreferrer');
+    }
+  }
+
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
@@ -552,6 +587,23 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-section">
+        <div class="share-label">Share this activity:</div>
+        <div class="share-buttons">
+          <button class="share-button share-facebook" data-platform="facebook" title="Share on Facebook" aria-label="Share ${escapeHtml(name)} on Facebook">
+            <span class="share-icon" aria-hidden="true">📘</span>
+            <span class="share-text">Facebook</span>
+          </button>
+          <button class="share-button share-twitter" data-platform="twitter" title="Share on Twitter" aria-label="Share ${escapeHtml(name)} on Twitter">
+            <span class="share-icon" aria-hidden="true">🐦</span>
+            <span class="share-text">Twitter</span>
+          </button>
+          <button class="share-button share-email" data-platform="email" title="Share via Email" aria-label="Share ${escapeHtml(name)} via Email">
+            <span class="share-icon" aria-hidden="true">📧</span>
+            <span class="share-text">Email</span>
+          </button>
+        </div>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -575,6 +627,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const platform = button.dataset.platform;
+        shareActivity(platform, name, details);
+      });
     });
 
     // Add click handler for register button (only when authenticated)
